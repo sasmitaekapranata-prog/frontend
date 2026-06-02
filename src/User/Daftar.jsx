@@ -4,7 +4,7 @@ export default function Daftar({ onBack, onNext }) {
   const [username, setUsername] = useState('');
   const [emailPhone, setEmailPhone] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = false || useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Aturan validasi kekuatan password
   const rules = {

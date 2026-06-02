@@ -1,5 +1,6 @@
 import { useState } from 'react';
-// import API from '../api'; // Dimatikan sementara karena file api belum dibuat
+// 🟢 INTEGRASI BACKEND: Mengimpor fungsi loginUser dari file authApi.js Anda
+import { loginUser } from '../authApi'; 
 
 export default function MasukUser({ onBack, onLoginSuccess }) {
   const [phone, setPhone] = useState(''); 
@@ -9,6 +10,13 @@ export default function MasukUser({ onBack, onLoginSuccess }) {
 
   const isFormValid = phone.trim() !== '' && password.trim() !== '' && !isLoading;
 
+  // Fungsi tambahan untuk mengamankan agar input nomor HP hanya menerima angka
+  const handlePhoneChange = (e) => {
+    const rawValue = e.target.value;
+    const cleanValue = rawValue.replace(/[^0-9]/g, ''); 
+    setPhone(cleanValue);
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault(); 
     if (!isFormValid) return;
@@ -16,27 +24,13 @@ export default function MasukUser({ onBack, onLoginSuccess }) {
     setIsLoading(true);
 
     try {
-      // --- SIMULASI LOGIN SEMENTARA (Sambil Menunggu API Backend Siap) ---
+      // 🟢 HUBUNGKAN KE BACKEND ASLI MENGGUNAKAN FUNGSI YANG SUDAH ANDA BUAT DI AUTHAPI.JS
       console.log("Mencoba login dengan:", { nomor_hp: phone, password: password });
       
-      // Simulasi jeda loading selama 1 detik
-      await new Promise((resolve) => setTimeout(resolve, 1000)); 
+      const data = await loginUser(phone, password);
       
-      const fakeToken = "dummy-token-trustpay-12345";
-      alert('Login Berhasil! (Mode Simulasi Tanpa Backend)');
-      
-      if (onLoginSuccess) {
-        onLoginSuccess(fakeToken);
-      }
-      // ------------------------------------------------------------------
-
-      /* // Kode Asli API ini bisa diaktifkan kembali nanti jika file src/api.js sudah ada:
-      const response = await API.post('/login', {
-        nomor_hp: phone, 
-        password: password
-      });
-
-      const token = response.data?.token;
+      // Ambil token autentikasi asli hasil return response backend Anda
+      const token = data?.token; 
 
       if (token) {
         alert('Login Berhasil!');
@@ -46,11 +40,11 @@ export default function MasukUser({ onBack, onLoginSuccess }) {
       } else {
         alert('Gagal mendapatkan token autentikasi dari server.');
       }
-      */
 
     } catch (err) {
       console.error("Gagal Login API:", err);
-      alert(err.response?.data?.message || 'Login Gagal! Nomor HP atau Password salah.');
+      // Menampilkan pesan error asli/riil yang dikirim oleh rest-api backend Anda
+      alert(err || 'Login Gagal! Nomor HP atau Password salah.');
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +92,7 @@ export default function MasukUser({ onBack, onLoginSuccess }) {
                 type="tel" 
                 placeholder="Contoh: 081362267690" 
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
                 disabled={isLoading}
                 className="input-field"
                 style={styles.input} 
@@ -152,7 +146,7 @@ export default function MasukUser({ onBack, onLoginSuccess }) {
   );
 }
 
-// ARSITEKTUR STRUKTUR GAYA VISUAL FORM LOGIN 
+// ARSITEKTUR STRUKTUR GAYA VISUAL FORM LOGIN (TIDAK BERUBAH)
 const styles = {
   container: { 
     display: 'flex', 
